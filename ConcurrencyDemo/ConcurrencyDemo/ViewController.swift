@@ -50,11 +50,19 @@ class ViewController: UIViewController {
     }
     
     @IBAction func didClickOnStart(sender: AnyObject) {
-        concurrentQueueMethod()
-//        serialQueueMethod()
+//        concurrentExcuteByGCD()
+//        serialExcuteByGCD()
     }
     
-   private func serialQueueMethod(){
+    private func serialExcuteByOperationQueue() {
+        
+    }
+    
+    private func concurrentExcuteByOperationQueue() {
+        
+    }
+    
+   private func serialExcuteByGCD(){
         let lArr : [UIImageView] = [imageView1, imageView2, imageView3, imageView4]
         
         //串行队列，异步执行时，只开一个子线程
@@ -102,7 +110,7 @@ class ViewController: UIViewController {
         }
     }
     
-   private func concurrentQueueMethod(){
+   private func concurrentExcuteByGCD(){
         let lArr : [UIImageView] = [imageView1, imageView2, imageView3, imageView4]
         
         for i in 0..<lArr.count{
