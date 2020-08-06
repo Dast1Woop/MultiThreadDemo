@@ -15,9 +15,9 @@ let imageURLs = ["http://www.planetware.com/photos-large/F/france-paris-eiffel-t
 
 class Downloader {
     
-    class func downloadImageWithURL(url:String,  block:@escaping(UIImage?) ->  Void)  {
+    class func downloadImageWithURLStr(urlStr:String,  block:@escaping(UIImage?) ->  Void)  {
         
-        let data = NSData(contentsOf: NSURL(string: url)! as URL)
+        let data = NSData(contentsOf: NSURL(string: urlStr)! as URL)
         if let lD = data{
             let lImg = UIImage(data: lD as Data)
 //            DispatchQueue.main.async {
@@ -39,6 +39,11 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var sliderValueLabel: UILabel!
     
+    lazy var gOpeQueue: OperationQueue = {
+        let lQ = OperationQueue.init()
+        return lQ
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -52,13 +57,67 @@ class ViewController: UIViewController {
     @IBAction func didClickOnStart(sender: AnyObject) {
 //        concurrentExcuteByGCD()
 //        serialExcuteByGCD()
+        serialExcuteByOperationQueue()
+//        concurrentExcuteByOperationQueue()
     }
     
+    /*log:
+     第0个加入队列
+     第0个下载成功
+     第0个开始显示
+     第1个加入队列
+     第1个下载成功
+     第1个开始显示
+     第2个加入队列
+     第2个下载成功
+     第2个开始显示
+     第3个加入队列
+     第3个下载成功
+     第3个开始显示
+     */
     private func serialExcuteByOperationQueue() {
         
+        //串行效果
+        gOpeQueue.maxConcurrentOperationCount = 1
+        
+        concurrentExcuteByOperationQueue()
     }
     
+    /*log:
+    第0个加入队列
+    第1个加入队列
+    第2个加入队列
+    第3个加入队列
+    第2个下载成功
+    第2个开始显示
+    第0个下载成功
+    第0个开始显示
+    第3个下载成功
+    第3个开始显示
+    第1个下载成功
+    第1个开始显示
+     */
     private func concurrentExcuteByOperationQueue() {
+        let lArr : [UIImageView] = [imageView1, imageView2, imageView3, imageView4]
+        
+        for i in 0..<lArr.count{
+            let lImgV = lArr[i]
+            
+            //清空旧图片
+            lImgV.image = nil
+            
+            //todo:是否有循环引用？
+            gOpeQueue.addOperation {
+                print("第\(i)个加入队列")
+                Downloader.downloadImageWithURLStr(urlStr: imageURLs[i]) { (img) in
+                    print("第\(i)个下载成功")
+                    DispatchQueue.main.async {
+                        print("第\(i)个开始显示")
+                        lImgV.image = img
+                    }
+                }
+            }
+        }
         
     }
     
@@ -94,7 +153,7 @@ class ViewController: UIViewController {
             serialQ.async {
                 
                 print("第\(i)个 开始，%@",Thread.current)
-                Downloader.downloadImageWithURL(url: imageURLs[i]) { (img) in
+                Downloader.downloadImageWithURLStr(urlStr: imageURLs[i]) { (img) in
                     let lImgV = lArr[i]
                     
                     print("第\(i)个 结束")
@@ -132,7 +191,7 @@ class ViewController: UIViewController {
              */
             DispatchQueue.global(qos: .background).async {
                 print("第\(i)个开始，%@", Thread.current)
-                Downloader.downloadImageWithURL(url: imageURLs[i]) { (img) in
+                Downloader.downloadImageWithURLStr(urlStr: imageURLs[i]) { (img) in
                     let lImgV = lArr[i]
                       print("第\(i)个结束")
                     DispatchQueue.main.async {
