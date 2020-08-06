@@ -62,8 +62,18 @@ class ViewController: UIViewController {
     @IBAction func didClickOnStart(sender: AnyObject) {
 //        concurrentExcuteByGCD()
 //        serialExcuteByGCD()
-//        serialExcuteByOperationQueue()
-        concurrentExcuteByOperationQueue()
+        serialExcuteByOperationQueue()
+//        concurrentExcuteByOperationQueue()
+    }
+    
+    ///暂停队列，只对非执行中的任务有效。本例中对串行队列的效果明显。并行队列因4个任务一开始就很容易一起开始执行，即使挂起也无法影响已处于执行状态的任务。
+    @IBAction func pauseQueueItemDC(_ sender: Any) {
+        gOpeQueue.isSuspended = true
+    }
+    
+    ///恢复队列，之前未开始执行的任务会开始执行
+    @IBAction func resumeQueueItemDC(_ sender: Any) {
+       gOpeQueue.isSuspended = false
     }
     
     /*log:

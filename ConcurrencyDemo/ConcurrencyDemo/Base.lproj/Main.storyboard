@@ -110,11 +110,23 @@
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <navigationItem key="navigationItem" id="740-DU-CFc">
-                        <barButtonItem key="rightBarButtonItem" title="Start" id="BUt-RJ-v1h">
-                            <connections>
-                                <action selector="didClickOnStartWithSender:" destination="BYZ-38-t0r" id="7Ti-fb-lXm"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem title="Start" id="BUt-RJ-v1h">
+                                <connections>
+                                    <action selector="didClickOnStartWithSender:" destination="BYZ-38-t0r" id="7Ti-fb-lXm"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="resume" id="A4s-UJ-RJ5">
+                                <connections>
+                                    <action selector="resumeQueueItemDC:" destination="BYZ-38-t0r" id="NY2-vM-2nc"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="pause" id="oaW-c7-T9d">
+                                <connections>
+                                    <action selector="pauseQueueItemDC:" destination="BYZ-38-t0r" id="cI4-gx-pFJ"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
                         <outlet property="imageView1" destination="S10-3H-623" id="lVZ-hd-XjF"/>
