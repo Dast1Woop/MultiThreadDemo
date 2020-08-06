@@ -49,6 +49,11 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
     }
     
+    deinit {
+        gOpeQueue.cancelAllOperations()
+        print("die:%@",self)
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -57,8 +62,8 @@ class ViewController: UIViewController {
     @IBAction func didClickOnStart(sender: AnyObject) {
 //        concurrentExcuteByGCD()
 //        serialExcuteByGCD()
-        serialExcuteByOperationQueue()
-//        concurrentExcuteByOperationQueue()
+//        serialExcuteByOperationQueue()
+        concurrentExcuteByOperationQueue()
     }
     
     /*log:
@@ -106,9 +111,11 @@ class ViewController: UIViewController {
             //清空旧图片
             lImgV.image = nil
             
-            //todo:是否有循环引用？
+            //todo:为何没有循环引用？self->gOpeQueue->OperationBlock->imageView1->self
             gOpeQueue.addOperation {
                 print("第\(i)个加入队列")
+                print(self.imageView1 as Any)
+                
                 Downloader.downloadImageWithURLStr(urlStr: imageURLs[i]) { (img) in
                     print("第\(i)个下载成功")
                     DispatchQueue.main.async {
@@ -118,7 +125,6 @@ class ViewController: UIViewController {
                 }
             }
         }
-        
     }
     
    private func serialExcuteByGCD(){
