@@ -121,9 +121,30 @@ class ViewController: UIViewController {
             //清空旧图片
             lImgV.image = nil
             
-            //todo:为何没有循环引用？self->gOpeQueue->OperationBlock->imageView1->self
+            //为何没有循环引用？self->gOpeQueue->OperationBlock->imageView1->self。A:其实是有的，通过instrument可以验证。只是，队列在执行完毕操作后，会自动释放操作对象，自动解除循环引用。
+            /*验证方法二：进入此页面，点击开始，立刻返回。看log：
+             第0个加入队列
+             Optional(<UIImageView: 0x7fc9cb602ac0; frame = (0 0; 187.5 110.5); autoresize = RM+BM; userInteractionEnabled = NO; layer = <CALayer: 0x600000b7d8e0>>)
+             第0个下载成功
+             第1个加入队列
+             Optional(<UIImageView: 0x7fc9cb602ac0; frame = (0 0; 187.5 110.5); autoresize = RM+BM; userInteractionEnabled = NO; layer = <CALayer: 0x600000b7d8e0>>)
+             第0个开始显示
+             第1个下载成功
+             第1个开始显示
+             第2个加入队列
+             Optional(<UIImageView: 0x7fc9cb602ac0; frame = (0 0; 187.5 110.5); opaque = NO; autoresize = RM+BM; userInteractionEnabled = NO; layer = <CALayer: 0x600000b7d8e0>>)
+             第2个下载成功
+             第2个开始显示
+             第3个加入队列
+             Optional(<UIImageView: 0x7fc9cb602ac0; frame = (0 0; 187.5 110.5); opaque = NO; autoresize = RM+BM; userInteractionEnabled = NO; layer = <CALayer: 0x600000b7d8e0>>)
+             第3个下载成功
+             第3个开始显示
+             die:%@ <ConcurrencyDemo.ViewController: 0x7fc9cb5174b0>
+             */
             gOpeQueue.addOperation {
                 print("第\(i)个加入队列")
+                
+                //当把下面注释掉时，是没有循环引用的。进入此页面，点击开始，立刻返回。看log即可发现，未开始执行的操作都没有执行，vc很快就deinit了。
                 print(self.imageView1 as Any)
                 
                 Downloader.downloadImageWithURLStr(urlStr: imageURLs[i]) { (img) in
