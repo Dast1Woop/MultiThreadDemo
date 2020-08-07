@@ -59,11 +59,14 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    //MARK: - action
     @IBAction func didClickOnStart(sender: AnyObject) {
 //        concurrentExcuteByGCD()
-//        serialExcuteByGCD()
-        serialExcuteByOperationQueue()
+        serialExcuteByGCD()
+//        serialExcuteByOperationQueue()
 //        concurrentExcuteByOperationQueue()
+        
+        testGCDBarrier()
     }
     
     ///暂停队列，只对非执行中的任务有效。本例中对串行队列的效果明显。并行队列因4个任务一开始就很容易一起开始执行，即使挂起也无法影响已处于执行状态的任务。
@@ -74,6 +77,37 @@ class ViewController: UIViewController {
     ///恢复队列，之前未开始执行的任务会开始执行
     @IBAction func resumeQueueItemDC(_ sender: Any) {
        gOpeQueue.isSuspended = false
+    }
+    
+    //MARK: - private
+    /*Dispatch barriers go along with custom concurrent queues. They can be used with two functions: dispach_barrier_async and dispatch_barrier_sync. These work just like dispatch_async and dispatch_sync except that, if used on a custom concurrent queue, the block that's submitted with the barrier function doesn't run concurrently with other work on that queue. Instead, it waits until anything currently executing on the queue is finished, then blocks everything else on the queue while the barrier block executes. Once the barrier completes, execution resumes normally.
+    Note that these barrier functions are pointless on a serial queue, since every unit of work blocks other work on such a queue. They are non-functional when used on the global queues, where they simply do a non-barrier dispatch_async or dispatch_sync. This is because the global queues are a shared resource and it doesn't make sense to allow a single component to block them for everybody.
+     */
+    func testGCDBarrier(){
+        
+        let lCusConQ = DispatchQueue.init(label: "cusConQ", qos: .background, attributes: .concurrent)
+        
+        for i in 0...100 {
+            lCusConQ.async {
+                print("barrier前：\(i)")
+            }
+            
+            //会有栅栏效果
+            lCusConQ.async(flags: DispatchWorkItemFlags.barrier) {
+                print("barrier：\(i)")
+            }
+            
+            //没有栅栏效果，能找出乱序的log。比如55在100之后才log
+//            lCusConQ.async {
+//                 print("barrier：\(i)")
+//            }
+            
+            
+            lCusConQ.async {
+                print("barrier后：\(i)")
+            }
+        }
+        
     }
     
     /*log:
@@ -141,6 +175,7 @@ class ViewController: UIViewController {
              第3个开始显示
              die:%@ <ConcurrencyDemo.ViewController: 0x7fc9cb5174b0>
              */
+        
             gOpeQueue.addOperation {
                 print("第\(i)个加入队列")
                 
@@ -226,7 +261,8 @@ class ViewController: UIViewController {
              第1个结束
              第2个结束
              */
-            DispatchQueue.global(qos: .background).async {
+            let lConQ = DispatchQueue.init(label: "cusQueue", qos: .background, attributes: .concurrent)
+            lConQ.async {
                 print("第\(i)个开始，%@", Thread.current)
                 Downloader.downloadImageWithURLStr(urlStr: imageURLs[i]) { (img) in
                     let lImgV = lArr[i]
@@ -239,6 +275,8 @@ class ViewController: UIViewController {
                     }
                 }
             }
+            
+          
         }
     }
     
