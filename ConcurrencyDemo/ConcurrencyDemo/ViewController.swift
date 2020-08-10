@@ -66,7 +66,8 @@ class ViewController: UIViewController {
 //        serialExcuteByOperationQueue()
 //        concurrentExcuteByOperationQueue()
         
-        testGCDBarrier()
+//        testGCDBarrier()
+        testDepedence()
     }
     
     ///暂停队列，只对非执行中的任务有效。本例中对串行队列的效果明显。并行队列因4个任务一开始就很容易一起开始执行，即使挂起也无法影响已处于执行状态的任务。
@@ -77,6 +78,47 @@ class ViewController: UIViewController {
     ///恢复队列，之前未开始执行的任务会开始执行
     @IBAction func resumeQueueItemDC(_ sender: Any) {
        gOpeQueue.isSuspended = false
+    }
+    
+    /*log:
+     op3
+     op4
+     op2
+     op1
+     op0
+     说明：操作间不存在依赖时，按优先级执行；存在依赖时，优先级无效
+     */
+    func testDepedence(){
+        let op0 = BlockOperation.init {
+            print("op0")
+        }
+        
+        let op1 = BlockOperation.init {
+            print("op1")
+        }
+        
+        let op2 = BlockOperation.init {
+            print("op2")
+        }
+        
+        let op3 = BlockOperation.init {
+            print("op3")
+        }
+        
+        let op4 = BlockOperation.init {
+            print("op4")
+        }
+        
+        op0.addDependency(op1)
+        op1.addDependency(op2)
+        
+        op0.queuePriority = .veryHigh
+        op1.queuePriority = .normal
+        op2.queuePriority = .veryLow
+        op3.queuePriority = .low
+        op4.queuePriority = .low
+        
+        gOpeQueue.addOperations([op0, op1, op2, op3, op4], waitUntilFinished: false)
     }
     
     //MARK: - private
