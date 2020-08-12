@@ -67,7 +67,8 @@ class ViewController: UIViewController {
 //        concurrentExcuteByOperationQueue()
         
 //        testGCDBarrier()
-        testDepedence()
+//        testDepedence()
+//        testDeadLock()
     }
     
     ///暂停队列，只对非执行中的任务有效。本例中对串行队列的效果明显。并行队列因4个任务一开始就很容易一起开始执行，即使挂起也无法影响已处于执行状态的任务。
@@ -78,6 +79,16 @@ class ViewController: UIViewController {
     ///恢复队列，之前未开始执行的任务会开始执行
     @IBAction func resumeQueueItemDC(_ sender: Any) {
        gOpeQueue.isSuspended = false
+    }
+    
+    //MARK: - private
+    func testDeadLock(){
+        //串行队列同步执行，会导致死锁。block需要等待testDeadLock执行，而串行同步又使其他任务必须等待此block执行。于是形成了相互等待，就死锁了。
+        DispatchQueue.main.sync {
+            print("main block")
+            
+        }
+        print("2")
     }
     
     /*log:
@@ -121,7 +132,7 @@ class ViewController: UIViewController {
         gOpeQueue.addOperations([op0, op1, op2, op3, op4], waitUntilFinished: false)
     }
     
-    //MARK: - private
+
     /*Dispatch barriers go along with custom concurrent queues. They can be used with two functions: dispach_barrier_async and dispatch_barrier_sync. These work just like dispatch_async and dispatch_sync except that, if used on a custom concurrent queue, the block that's submitted with the barrier function doesn't run concurrently with other work on that queue. Instead, it waits until anything currently executing on the queue is finished, then blocks everything else on the queue while the barrier block executes. Once the barrier completes, execution resumes normally.
     Note that these barrier functions are pointless on a serial queue, since every unit of work blocks other work on such a queue. They are non-functional when used on the global queues, where they simply do a non-barrier dispatch_async or dispatch_sync. This is because the global queues are a shared resource and it doesn't make sense to allow a single component to block them for everybody.
      */
