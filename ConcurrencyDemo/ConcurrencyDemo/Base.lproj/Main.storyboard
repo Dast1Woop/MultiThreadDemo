@@ -16,10 +16,10 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J25-aH-J3i">
-                                <rect key="frame" x="188.66666666666666" y="348" width="37" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J25-aH-J3i" userLabel="swift相关">
+                                <rect key="frame" x="160" y="353" width="94" height="30"/>
                                 <color key="backgroundColor" systemColor="systemRedColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <state key="normal" title="show"/>
+                                <state key="normal" title="swift语言验证"/>
                                 <connections>
                                     <segue destination="BYZ-38-t0r" kind="show" id="anb-ro-ZD8"/>
                                 </connections>
@@ -27,7 +27,7 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="J25-aH-J3i" firstAttribute="top" secondItem="Mz0-6V-AJD" secondAttribute="top" constant="304" id="4Rw-T4-s4C"/>
+                            <constraint firstItem="J25-aH-J3i" firstAttribute="top" secondItem="Mz0-6V-AJD" secondAttribute="top" constant="309" id="4Rw-T4-s4C"/>
                             <constraint firstItem="J25-aH-J3i" firstAttribute="centerX" secondItem="Mz0-6V-AJD" secondAttribute="centerX" id="LKl-j2-3aw"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Mz0-6V-AJD"/>
@@ -36,7 +36,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Dx9-4z-cBY" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="792.75362318840587" y="365.625"/>
+            <point key="canvasLocation" x="792.75362318840587" y="365.21739130434787"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">

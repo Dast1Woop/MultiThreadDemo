@@ -59,8 +59,8 @@ class ViewController: UIViewController {
     //MARK: - action
     @IBAction func didClickOnStart(sender: AnyObject) {
 //        concurrentExcuteByGCD()
-        serialExcuteByGCD()
-//        serialExcuteByOperationQueue()
+//        serialExcuteByGCD()
+        serialExcuteByOperationQueue()
 //        concurrentExcuteByOperationQueue()
         
 //        testGCDBarrier()
@@ -80,21 +80,26 @@ class ViewController: UIViewController {
     
     //MARK: - private
     func testDeadLock(){
-        //串行队列同步执行，会导致死锁。block需要等待testDeadLock执行，而串行同步又使其他任务必须等待此block执行。于是形成了相互等待，就死锁了。
+        //主队列同步执行，会导致死锁。block需要等待testDeadLock执行，而主同步又使其他任务必须等待此block执行。于是形成了相互等待，就死锁了。
         DispatchQueue.main.sync {
             print("main block")
-            
         }
         print("2")
     }
-    
+
     /*log:
-     op3
-     op4
-     op2
-     op1
-     op0
-     说明：操作间不存在依赖时，按优先级执行；存在依赖时，优先级无效
+ op4
+ op2
+ op3
+ op1
+ op0
+ 或
+ op4
+ op3
+ op2
+ op1
+ op0
+     说明：操作间不存在依赖时，按优先级执行；存在依赖时，按依赖关系先后执行（与无依赖关系的其他任务相比，依赖集合的执行顺序不确定）
      */
     func testDepedence(){
         let op0 = BlockOperation.init {
@@ -123,8 +128,9 @@ class ViewController: UIViewController {
         op0.queuePriority = .veryHigh
         op1.queuePriority = .normal
         op2.queuePriority = .veryLow
+        
         op3.queuePriority = .low
-        op4.queuePriority = .low
+        op4.queuePriority = .veryHigh
         
         gOpeQueue.addOperations([op0, op1, op2, op3, op4], waitUntilFinished: false)
     }
@@ -206,7 +212,7 @@ class ViewController: UIViewController {
             lImgV.image = nil
             
             //为何没有循环引用？self->gOpeQueue->OperationBlock->imageView1->self。A:其实是有的，通过instrument可以验证。只是，队列在执行完毕操作后，会自动释放操作对象，自动解除循环引用。
-            /*验证方法二：进入此页面，点击开始，立刻返回。看log：
+            /*验证方法：进入此页面，点击开始，立刻返回。看log：
              第0个加入队列
              Optional(<UIImageView: 0x7fc9cb602ac0; frame = (0 0; 187.5 110.5); autoresize = RM+BM; userInteractionEnabled = NO; layer = <CALayer: 0x600000b7d8e0>>)
              第0个下载成功
@@ -300,7 +306,7 @@ class ViewController: UIViewController {
             //清空旧图片
             lImgV.image = nil
             
-            //方法一、并行队列。图片下载任务按顺序开始，但是是并行执行，不会相互等待，任务结束和图片显示顺序是无序的，多个子线程同时执行，性能更佳。
+            //并行队列:图片下载任务按顺序开始，但是是并行执行，不会相互等待，任务结束和图片显示顺序是无序的，多个子线程同时执行，性能更佳。
             /*log:
              第0个开始，%@ <NSThread: 0x600002de2e00>{number = 4, name = (null)}
              第1个开始，%@ <NSThread: 0x600002dc65c0>{number = 6, name = (null)}
@@ -325,8 +331,6 @@ class ViewController: UIViewController {
                     }
                 }
             }
-            
-          
         }
     }
     
