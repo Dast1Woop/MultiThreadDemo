@@ -2,9 +2,6 @@
 //  ViewController.swift
 //  ConcurrencyDemo
 //
-//  Created by Hossam Ghareeb on 11/15/15.
-//  Copyright © 2015 Hossam Ghareeb. All rights reserved.
-//
 
 import UIKit
 
@@ -250,7 +247,7 @@ class ViewController: UIViewController {
         let lArr : [UIImageView] = [imageView1, imageView2, imageView3, imageView4]
         
         //串行队列，异步执行时，只开一个子线程
-        let serialQ = DispatchQueue.init(label: "com.ht.serial.downImage")
+        let serialQ = DispatchQueue.init(label: "com.companyName.serial.downImage")
         
         for i in 0..<lArr.count{
             let lImgV = lArr[i]
@@ -259,7 +256,7 @@ class ViewController: UIViewController {
             lImgV.image = nil
             
          //注意，防坑：串行队列创建的位置,在这创建时，每个循环都是一个新的串行队列，里面只装一个任务，多个串行队列，整体上是并行的效果。
-            //            let serialQ = DispatchQueue.init(label: "com.ht.serial.downImage")
+            //            let serialQ = DispatchQueue.init(label: "com.companyName.serial.downImage")
             
             /*由log可知，切到主线程也需要时间，切换完成之前，指令可能已经执行到下个循环了。但是看起来图片还是依次下载完成和显示的，因为每一张图切到主线程显示都需要时间。
             第0个 开始
