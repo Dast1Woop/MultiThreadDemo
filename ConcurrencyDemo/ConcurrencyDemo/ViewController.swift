@@ -80,7 +80,7 @@ class ViewController: UIViewController {
     
     //MARK: - private
     func testDeadLock(){
-        //主队列同步执行，会导致死锁。block需要等待testDeadLock执行，而主同步又使其他任务必须等待此block执行。于是形成了相互等待，就死锁了。
+        //主队列同步执行，会导致死锁。block需要等待testDeadLock执行，而主队列同步调用,又使其他任务必须等待此block执行。于是形成了相互等待，就死锁了。
         DispatchQueue.main.sync {
             print("main block")
         }
